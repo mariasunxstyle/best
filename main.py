@@ -13,23 +13,30 @@ bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 steps = [
-    {"step": i, "positions": [
-        {"name": "Лицом вверх", "duration_min": 0.1},
-        {"name": "На животе", "duration_min": 0.1},
-        {"name": "Левый бок", "duration_min": 0.1},
-        {"name": "Правый бок", "duration_min": 0.1},
-        {"name": "В тени", "duration_min": 0.1},
-    ]} for i in range(1, 13)
+    {"step": 1, "positions": [
+        {"name": "Лицом вверх", "duration_min": 1.5},
+        {"name": "На животе", "duration_min": 1.5},
+        {"name": "Левый бок", "duration_min": 1.0},
+        {"name": "Правый бок", "duration_min": 1.0},
+        {"name": "В тени", "duration_min": 3.0},
+    ]},
+    {"step": 2, "positions": [
+        {"name": "Лицом вверх", "duration_min": 2.0},
+        {"name": "На животе", "duration_min": 2.0},
+        {"name": "Левый бок", "duration_min": 1.0},
+        {"name": "Правый бок", "duration_min": 1.0},
+        {"name": "В тени", "duration_min": 3.0},
+    ]}
 ]
 
 user_states = {}
 
 def steps_keyboard():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=3)
-    buttons = [
-        KeyboardButton(f"Шаг {s['step']} — {int(sum(p['duration_min'] for p in s['positions']))} мин") for s in steps
-    ]
-    kb.add(*buttons)
+    for s in steps:
+        total_time = int(sum(p['duration_min'] for p in s['positions']))
+        label = f"Шаг {s['step']} — {total_time} мин"
+        kb.add(KeyboardButton(label))
     kb.add(KeyboardButton("ℹ️ Инфо"))
     return kb
 
@@ -43,7 +50,30 @@ def control_keyboard():
 
 @dp.message_handler(commands=["start"])
 async def start_cmd(msg: types.Message):
-    await msg.answer("Привет! Выбери шаг:", reply_markup=steps_keyboard())
+    await msg.answer(
+        "Привет, солнце! ☀️\n"
+        "Ты в таймере по методу суперкомпенсации.\n"
+        "Кожа адаптируется к солнцу постепенно — и загар становится ровным, глубоким и без ожогов.\n\n"
+        "Начинай с шага 1. Даже если уже немного загорел(а), важно пройти путь с начала.\n"
+        "Каждый новый день и после перерыва — возвращайся на 2 шага назад.\n\n"
+        "Хочешь разобраться подробнее — жми /info. Там всё по делу.",
+        reply_markup=steps_keyboard())
+
+@dp.message_handler(commands=["info"])
+async def info_cmd(msg: types.Message):
+    await msg.answer(
+        "ℹ️ Инфо\n"
+        "Метод суперкомпенсации — это безопасный, пошаговый подход к загару.\n"
+        "Он помогает коже адаптироваться к солнцу, снижая риск ожогов и пятен.\n\n"
+        "Рекомендуем загорать с 7:00 до 11:00 и после 17:00 — в это время солнце мягкое,\n"
+        "и при отсутствии противопоказаний можно загорать без SPF.\n"
+        "Так кожа включает свою естественную защиту: вырабатывается меланин и гормоны адаптации.\n\n"
+        "С 11:00 до 17:00 — солнце более агрессивное. Если остаёшься на улице —\n"
+        "надевай одежду, головной убор или используй SPF.\n\n"
+        "Каждый новый день и после перерыва — возвращайся на 2 шага назад.\n"
+        "Это нужно, чтобы кожа не перегружалась и постепенно усиливала защиту.\n\n"
+        "Если есть вопросы — пиши: @sunxbeach_director"
+    )
 
 @dp.message_handler(lambda m: m.text and m.text.startswith("Шаг "))
 async def handle_step(msg: types.Message):
