@@ -93,3 +93,16 @@ INFO_TEXT = """ℹ️ Инфо
 Это нужно, чтобы кожа не перегружалась и постепенно усиливала защиту.
 
 Если есть вопросы — пиши: @sunxbeach_director"""
+
+
+# Полное меню управления в 4 строки (после завершения шага)
+control_keyboard_full = ReplyKeyboardMarkup(resize_keyboard=True)
+control_keyboard_full.add(KeyboardButton("▶️ Продолжить"))
+control_keyboard_full.add(KeyboardButton("📋 Вернуться к шагам"))
+control_keyboard_full.add(KeyboardButton("↩️ Назад на 2 шага"))
+control_keyboard_full.add(KeyboardButton("⛔ Завершить"))
+
+# Меню после завершения всех 12 шагов
+end_keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+end_keyboard.add(KeyboardButton("📋 Вернуться к шагам"))
+end_keyboard.add(KeyboardButton("↩️ Назад на 2 шага"))

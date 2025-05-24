@@ -8,6 +8,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.utils import executor
 from handlers import *
+from aiogram import types
 
 API_TOKEN = os.getenv("TOKEN")
 CHANNEL_USERNAME = os.getenv("CHANNEL")
@@ -107,3 +108,15 @@ async def back_to_steps(message: types.Message):
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True)
+
+@dp.message_handler(lambda m: m.text == "↩️ Назад на 2 шага")
+async def go_back(message: types.Message):
+    user_id = message.chat.id
+    current_step = user_state.get(user_id, {}).get("step", 1)
+    new_step = 1 if current_step <= 2 else current_step - 2
+    user_state[user_id] = {"step": new_step, "position_index": 0}
+    await message.answer(f"Шаг {new_step}", reply_markup=control_keyboard)
+    await send_position_with_timer(user_id)
+
+async def handle_completion(user_id):
+    await bot.send_message(user_id, "Ты прошёл все 12 шагов", reply_markup=end_keyboard)
